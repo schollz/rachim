@@ -137,6 +137,7 @@ function Rachim:stop()
     if self.is_playing then
         self.is_playing = false
         self.pos = 0
+        self.steps = 10000
     end
 end
 
