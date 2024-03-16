@@ -24,9 +24,26 @@ rachim = {}
 rachim_num = 5
 shift = false
 
-engine.name = "Rachim"
+installer_ = include("lib/scinstaller/scinstaller")
+installer = installer_:new{
+    requirements = {"Fverb", "AnalogTape", "AnalogChew", "AnalogLoss", "AnalogDegrade"},
+    zip = "https://github.com/schollz/portedplugins/releases/download/v0.4.5/PortedPlugins-RaspberryPi.zip"
+}
+engine.name = installer:ready() and 'Rachim' or nil
 
 function init()
+    if not installer:ready() then
+        clock.run(function()
+            while true do
+                redraw()
+                clock.sleep(1 / 5)
+            end
+        end)
+        do
+            return
+        end
+    end
+
     params:add_number("sel_pattern", "pattern", 1, rachim_num, 3)
     params:add_number("sel_param", "param", 1, 20, 1)
 
@@ -52,6 +69,12 @@ function init()
 end
 
 function key(k, z)
+    if not installer:ready() then
+        installer:key(k, z)
+        do
+            return
+        end
+    end
     if k == 3 and z == 1 then
         if shift then
             local is_playing = false
@@ -79,6 +102,11 @@ function key(k, z)
 end
 
 function enc(k, z)
+    if not installer:ready() then
+        do
+            return
+        end
+    end
     if k == 1 then
         params:delta("sel_pattern", z)
     elseif k == 2 then
@@ -106,6 +134,12 @@ function enc(k, z)
 end
 
 function redraw()
+    if not installer:ready() then
+        installer:redraw()
+        do
+            return
+        end
+    end
     screen.clear()
     screen.aa(0)
     screen.font_face(3)
