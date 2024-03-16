@@ -12,59 +12,21 @@
 -- E3: change note
 -- K3: play pattern
 -- 
-MusicUtil = require "musicutil"
-
-pattern_selected = 1
-step_selected = 1
-patterns = {}
-for i = 1, 5 do
-    patterns[i] = {length = 16, data = {}, pos = 1, playing = False}
-    for j = 1, 16 do patterns[i].data[j] = 0 end
-end
-
-function add_pattern_params()
-    params:add_separator("pattern data")
-    for i = 1, 5 do
-        params:add_group("pattern " .. i, 19)
-        params:add{
-            type = "control",
-            name = "pattern " .. i .. " db",
-            id = "pattern_" .. i .. "_db",
-            controlspec = controlspec.new(-96, 6, 'lin', 0.1, 0, 'dB')
-        }
-        params:add{
-            type = "control",
-            name = "pattern " .. i .. " duration",
-            id = "pattern_" .. i .. "_dur",
-            controlspec = controlspec.new(0.1, 30, 'lin', 0,
-                                          math.random(1000, 20000) / 1000, 's')
-        }
-        params:add{
-            type = "number",
-            id = "pattern_" .. i .. "_length",
-            name = "pattern " .. i .. " length",
-            min = 1,
-            max = 16,
-            default = patterns[i].length,
-            action = function(x) patterns[i].length = x end
-        }
-        for j = 1, 16 do
-            params:add{
-                type = "number",
-                id = "pattern_" .. i .. "_data_" .. j,
-                name = "pattern " .. i .. " data " .. j,
-                min = 0,
-                max = 8,
-                default = patterns[i].data[j],
-                action = function(x) patterns[i].data[j] = x end
-            }
-        end
-    end
-
-end
+rachim_ = include("lib/rachim")
+rachim = {}
+rachim_num = 5
+shift = false
 
 function init()
-    add_pattern_params()
+    params:add_number("sel_pattern", "pattern", 1, rachim_num, 1)
+    params:add_number("sel_param", "param", 1, 20, 1)
+
+    for i = 1, rachim_num do
+        rachim[i] = rachim_:new({
+            id = i
+        })
+    end
+
     params:default()
 
     clock.run(function()
@@ -74,83 +36,70 @@ function init()
 
         end
     end)
-    for i = 1, 5 do
-        -- sleep for specified pattern dur
-        clock.run(function()
-            while true do
-                clock.sleep(params:get("pattern_" .. i .. "_dur"))
-                if patterns[i].playing then
-                    patterns[i].pos = patterns[i].pos % patterns[i].length + 1
-                end
-            end
-        end)
-    end
 end
 
 function key(k, z)
     if k == 3 and z == 1 then
-        -- toggle playing
-        patterns[pattern_selected].playing =
-            not patterns[pattern_selected].playing
-    end
-end
-function enc(k, z)
-    if k == 1 then
-        pattern_selected = util.wrap(pattern_selected + z, 1, 5)
-        step_selected = step_selected % patterns[pattern_selected].length
-    elseif k == 2 then
-        step_selected = util.wrap(step_selected + z, 1,
-                                  patterns[pattern_selected].length)
-    elseif k == 3 then
-        params:delta(
-            "pattern_" .. pattern_selected .. "_data_" .. step_selected, z)
+        if shift then
+            local is_playing = false
+            for i = 1, rachim_num do
+                if rachim[i]:get_playing() then
+                    is_playing = true
+                end
+            end
+            if is_playing then
+                for i = 1, rachim_num do
+                    rachim[i]:stop()
+                end
+            else
+                for i = 1, rachim_num do
+                    rachim[i]:start()
+                end
+            end
+        else
+            -- toggle playing
+            rachim[params:get("sel_pattern")]:toggle()
+        end
+    elseif k == 1 then
+        shift = z == 1
     end
 end
 
-function refresh() redraw() end
+function enc(k, z)
+    if k == 1 then
+        params:delta("sel_pattern", z)
+    elseif k == 2 then
+        if z > 0 then
+            params:delta("sel_param", 1)
+        else
+            params:delta("sel_param", -1)
+        end
+        if params:get("sel_param") > params:get(params:get("sel_pattern") .. "length") + 4 then
+            params:set("sel_param", params:get(params:get("sel_pattern") .. "length") + 4)
+        end
+    elseif k == 3 then
+        if params:get("sel_param") == 1 then
+            params:delta(params:get("sel_pattern") .. "length", z)
+        elseif params:get("sel_param") == 2 then
+            params:delta(params:get("sel_pattern") .. "db", z)
+        elseif params:get("sel_param") == 3 then
+            params:delta(params:get("sel_pattern") .. "dur", z)
+        elseif params:get("sel_param") == 4 then
+            params:delta(params:get("sel_pattern") .. "wet", z)
+        else
+            params:delta(params:get("sel_pattern") .. "note" .. params:get("sel_param") - 4, z)
+        end
+    end
+end
 
 function redraw()
     screen.clear()
-    screen.level(5)
-    screen.rect(3, 2, 8, 7)
-    screen.fill()
-    screen.move(7, 8)
-    screen.level(0)
-    screen.text_center(pattern_selected)
+    screen.aa(0)
+    screen.font_face(3)
+    screen.level(15)
 
-    screen.level(5)
-    screen.move(7, 20)
-    local db = util.round(params:get("pattern_" .. pattern_selected .. "_db"))
-    local db_string = db .. ""
-    if db > 0 then db_string = "+" + db_string end
-    screen.text_center(db_string)
-
-    screen.move(7, 30)
-    screen.text_center(util.round(params:get(
-                                      "pattern_" .. pattern_selected .. "_dur"),
-                                  0.1))
-
-    for i = 1, 5 do
-        for j = 1, patterns[i].length do
-            local y = 12 * i - patterns[i].data[j]
-            local x = 7 * j + 11
-            -- center x based on the length of pattern
-            x = x + (16 - patterns[i].length) / 2 * 7
-            local level = 2
-            if pattern_selected == i then
-                level = 6
-                if step_selected == j then level = 8 end
-            end
-            if patterns[i].playing then
-                if j == patterns[i].pos then level = level + 7 end
-            end
-
-            screen.move(x, y)
-            screen.line(x + 5, y)
-            screen.level(level)
-            screen.stroke()
-        end
+    for i = 1, rachim_num do
+        rachim[i]:redraw()
     end
-
     screen.update()
 end
