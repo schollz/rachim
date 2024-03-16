@@ -172,10 +172,9 @@ end
 
 function Rachim:toggle()
   if self.is_playing then
-    self.is_playing=false
-    self.pos=0
+    self:stop()
   else
-    self.start_playing=true
+    self:start()
   end
 end
 
