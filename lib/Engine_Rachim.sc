@@ -68,7 +68,7 @@ Engine_Rachim : CroneEngine {
             arg busWet,busDry,db=0,freq=40,gate=1,wet=1,dur=1,id=1;
             var note=Vibrato.kr(freq,LFNoise2.kr(1/dur).range(0.1,1),LFNoise2.kr(1/dur).range(0.001,0.005),0.01).cpsmidi;
             var snd=Pulse.ar([note-Rand(0,0.05),note+Rand(0,0.05)].midicps,SinOsc.kr(Rand(1,3),Rand(0,pi)).range(0.3,0.7));
-            snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/dur).range(0.5,4),Rand(0,pi)).range(0.0,1.5));
+            snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/12).range(dur*0.5,dur),Rand(0,pi)).range(0.0,1.0));
             snd=RLPF.ar(snd,note.midicps*6,0.8);
             snd=snd*EnvGen.ar(Env.adsr(attackTime:dur,sustainLevel:1,releaseTime:dur*Rand(4,10)),gate:gate,doneAction:2);
             snd=Balance2.ar(snd[0],snd[1],Rand(-1,1));
@@ -92,9 +92,9 @@ Engine_Rachim : CroneEngine {
             );
             snd2 = sndWet + sndDry;
             snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
-            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.5),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
-            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.5),[snd2,AnalogDegrade.ar(snd2,0.2,0.2,0.5,0.5)]);
-            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.5),[snd2,AnalogLoss.ar(snd2,0.5,0.5,0.5,0.5)]);
+            snd2=SelectX.ar(LFNoise2.kr(1/13).range(0,0.4),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
+            snd2=SelectX.ar(LFNoise2.kr(1/10).range(0,0.6),[snd2,AnalogDegrade.ar(snd2,0.2,0.2,0.5,0.5)]);
+            snd2=SelectX.ar(LFNoise2.kr(1/12).range(0,0.3),[snd2,AnalogLoss.ar(snd2,0.5,0.5,0.5,0.5)]);
             snd2=snd2.tanh*0.75;
             snd2=HPF.ar(snd2,20);
             snd2=BPeakEQ.ar(snd2,24.midicps,1,3);

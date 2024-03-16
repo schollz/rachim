@@ -1,16 +1,23 @@
--- rachm v0.0.0
+-- rachim v0.1.0
 -- 
 --
--- llllllll.co/t/rachm
+-- llllllll.co/t/rachim
 --
 --
 --
 --    ▼ instructions below ▼
 --
 -- E1: select pattern
--- E2: select note
--- E3: change note
--- K3: play pattern
+-- E2: select parameter
+-- E3: change parameter
+-- K3: toggle play 
+-- K1+K3: toggle play all 
+-- top left going down:
+-- pattern id
+-- length
+-- volume
+-- duration
+-- wet
 -- 
 rachim_ = include("lib/rachim")
 rachim = {}
@@ -101,7 +108,7 @@ end
 function redraw()
     screen.clear()
     screen.aa(0)
-    screen.font_face(68)
+    screen.font_face(3)
     screen.level(15)
 
     for i = 1, rachim_num do

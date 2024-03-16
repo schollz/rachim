@@ -20,8 +20,8 @@ function Rachim:init()
     local default_octaves = {2, 1, 0, -1, -3}
     local default_dur = {math.random(100, 500) / 65, math.random(100, 500) / 55, math.random(100, 500) / 45,
                          math.random(100, 500) / 35, math.random(100, 500) / 25}
-    local default_wet = {0.7,0.8,0.9,0.9,1.0}
-    local default_db = {-7,-6,0,-2,-3}
+    local default_wet = {0.7, 0.8, 0.9, 0.9, 1.0}
+    local default_db = {-7, -6, 0, -2, -3}
     local params_menu = {{
         id = "db",
         name = "db",
@@ -37,7 +37,7 @@ function Rachim:init()
         max = 60,
         div = 0.1,
         exp = true,
-        default = default_dur[self.id]*2,
+        default = default_dur[self.id] * 2,
         engine = true
     }, {
         id = "wet",
@@ -62,6 +62,14 @@ function Rachim:init()
         default = default_octaves[self.id],
         div = 1
     }}
+    local pattern_melody = {}
+    for i = 1, math.random(3, 6) do
+        table.insert(pattern_melody, 0)
+    end
+    for i, _ in ipairs(pattern_melody) do
+        pattern_melody[i] = math.random(0, 100) < 5 and 0 or math.random(1, 8)
+    end
+
     for i = 1, 16 do
         table.insert(params_menu, {
             id = "note" .. i,
@@ -69,7 +77,7 @@ function Rachim:init()
             min = 0,
             max = 8,
             div = 1,
-            default = math.random(0, 8)
+            default = pattern_melody[(i - 1) % #pattern_melody + 1]
         })
     end
 
@@ -163,7 +171,7 @@ function Rachim:stop()
         self.is_playing = false
         self.pos = 0
         self.steps = 10000
-        engine.set(self.id,"db",-96)
+        engine.set(self.id, "db", -96)
     end
 end
 
@@ -176,17 +184,13 @@ function Rachim:redraw()
     if params:get("sel_pattern") == self.id then
         for i = 1, 5 do
             if i == 1 then
-                s = string.format("%02X",
-                    util.round(util.linlin(0, params:get(self.id .. "dur") * 10, 0, 255, self.steps)))
-                screen.level(10)
-                screen.move(6, y_start + (i - 1) * 11)
+                s = string.format("%02X", self.id)
+                screen.level(2)
+                screen.move(2, y_start + (i - 1) * 11)
                 screen.text(s:sub(1, 1))
-                screen.move(6 + 5, y_start + (i - 1) * 11)
+                screen.move(2 + 5, y_start + (i - 1) * 11)
                 screen.text(s:sub(-1))
-                -- screen.move(6, y_start + (i - 1) * 11)
-                -- screen.text("0")
-                -- screen.move(6 + 5, y_start + (i - 1) * 11)
-                -- screen.text(self.id)
+
             else
                 local param_list = {"none", "length", "db", "dur", "wet"}
 
@@ -198,14 +202,14 @@ function Rachim:redraw()
                 local level = 7
                 screen.level(level)
                 if i == params:get("sel_param") + 1 and self.id == params:get("sel_pattern") then
-                    screen.rect(6-1, y_start + (i - 1) * 11-6, 10, 7)
+                    screen.rect(2 - 1, y_start + (i - 1) * 11 - 6, 10, 7)
                     screen.fill()
                     screen.level(0)
                 end
 
-                screen.move(6, y_start + (i - 1) * 11)
+                screen.move(2, y_start + (i - 1) * 11)
                 screen.text(s:sub(1, 1))
-                screen.move(6 + 5, y_start + (i - 1) * 11)
+                screen.move(2 + 5, y_start + (i - 1) * 11)
                 screen.text(s:sub(-1))
 
             end
@@ -217,17 +221,24 @@ function Rachim:redraw()
             level = 7
         end
         if j == self.pos and self.is_playing then
-          level = 15
+            level = 15
         end
         screen.level(level)
         if j == params:get("sel_param") - 4 and self.id == params:get("sel_pattern") then
-          screen.rect(6 + 5 + 14 + (j - 1) * 6 - 1, y_start + (self.id - 1) * 11 - 6, 5, 7)
-          screen.fill()
-          screen.level(0)
+            screen.rect(3 + 2 + 14 + (j - 1) * 6 - 1, y_start + (self.id - 1) * 11 - 6, 5, 7)
+            screen.fill()
+            screen.level(0)
         end
-        screen.move(6 + 5 + 14 + (j - 1) * 6, y_start + (self.id - 1) * 11)
+        screen.move(3 + 2 + 14 + (j - 1) * 6, y_start + (self.id - 1) * 11)
         screen.text(params:get(self.id .. "note" .. j))
     end
+
+    s = string.format("%02X", util.round(util.linlin(0, params:get(self.id .. "dur") * 10, 0, 255, self.steps)))
+    screen.level(2)
+    screen.move(128 - 9, y_start + (self.id - 1) * 11)
+    screen.text(s:sub(1, 1))
+    screen.move(128 - 9 + 5, y_start + (self.id - 1) * 11)
+    screen.text(s:sub(-1))
 
 end
 
