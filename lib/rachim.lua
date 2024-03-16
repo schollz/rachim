@@ -22,6 +22,8 @@ function Rachim:init()
                          math.random(100, 500) / 35, math.random(100, 500) / 25}
     local default_wet = {0.7, 0.8, 0.9, 0.9, 1.0}
     local default_db = {-7, -6, 0, -2, -3}
+    local default_attack = {0.1, 1, 2, 3, 4}
+    local default_release = {1, 2, 4, 6, 8}
     local params_menu = {{
         id = "db",
         name = "db",
@@ -61,6 +63,22 @@ function Rachim:init()
         max = 3,
         default = default_octaves[self.id],
         div = 1
+    }, {
+        id = "attack",
+        name = "attack",
+        min = 0.1,
+        max = 30,
+        div = 0.1,
+        default = default_attack[self.id],
+        engine = true
+    }, {
+        id = "release",
+        name = "release",
+        min = 0.1,
+        max = 30,
+        div = 0.1,
+        default = default_release[self.id],
+        engine = true
     }}
     local pattern_melody = {}
     for i = 1, math.random(3, 6) do
@@ -133,9 +151,10 @@ function Rachim:init()
                 local freq = musicutil.note_num_to_freq(note)
                 if note_index > 0 then
                     engine.set(self.id, "db", params:get(self.id .. "db"))
+                    engine.set(self.id, "gate", 1)
                     engine.set(self.id, "freq", freq)
                 else
-                    engine.set(self.id, "db", -96)
+                    engine.set(self.id, "gate", 0)
                 end
                 print(self.id .. " " .. self.pos)
                 self.steps = 0
@@ -171,7 +190,7 @@ function Rachim:stop()
         self.is_playing = false
         self.pos = 0
         self.steps = 10000
-        engine.set(self.id, "db", -96)
+        engine.set(self.id, "gate", 0)
     end
 end
 
@@ -184,27 +203,46 @@ function Rachim:redraw()
     if params:get("sel_pattern") == self.id then
         for i = 1, 5 do
             if i == 1 then
-                s = string.format("%02X", self.id)
-                screen.level(2)
-                screen.move(2, y_start + (i - 1) * 11)
-                screen.text(s:sub(1, 1))
-                screen.move(2 + 5, y_start + (i - 1) * 11)
-                screen.text(s:sub(-1))
-
+                if params:get("sel_param") > 4 then
+                    local level = 6
+                    screen.level(level)
+                    screen.rect(2 - 1, y_start + (i - 1) * 11 - 6, 10, 7)
+                    screen.fill()
+                    s = string.format("%02X", self.id)
+                    screen.level(0)
+                    screen.move(2, y_start + (i - 1) * 11)
+                    screen.text(s:sub(1, 1))
+                    screen.move(2 + 5, y_start + (i - 1) * 11)
+                    screen.text(s:sub(-1))
+                end
             else
                 local param_list = {"none", "length", "db", "dur", "wet"}
+                local param_name = {"none", "len", "db", "dur", "rev"}
 
                 local s = string.format("%02X", util.round(
                     util.linlin(0.0, 1.0, 0, 255, params:get_raw(self.id .. param_list[i]))))
                 if i == 2 then
                     s = string.format("%02X", params:get(self.id .. param_list[i]))
                 end
-                local level = 7
+                local level = 6
                 screen.level(level)
                 if i == params:get("sel_param") + 1 and self.id == params:get("sel_pattern") then
+                    screen.rect(2 - 1, y_start + (1 - 1) * 11 - 6, 10, 7)
+                    screen.fill()
+                    screen.level(0)
+                    screen.move(2 + 4, y_start + (1 - 1) * 11)
+                    local s1 = param_name[i]
+                    -- truncate to 3 characters
+                    if string.len(s1) > 3 then
+                        s1 = string.sub(s1, 1, 3)
+                    end
+                    screen.text_center(s1)
+
+                    screen.level(level)
                     screen.rect(2 - 1, y_start + (i - 1) * 11 - 6, 10, 7)
                     screen.fill()
                     screen.level(0)
+
                 end
 
                 screen.move(2, y_start + (i - 1) * 11)
