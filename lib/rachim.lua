@@ -1,5 +1,5 @@
 local Rachim = {}
-
+local musicutil = require "musicutil"
 function Rachim:new(args)
     local m = setmetatable({}, {
         __index = Rachim
@@ -17,6 +17,9 @@ function Rachim:init()
     self.pos = 0
     self.start_playing = false
     self.is_playing = false
+    local default_octaves = {2, 1, 0, -1, -3}
+    local default_dur = {math.random(100, 500) / 100, math.random(100, 500) / 55, math.random(100, 500) / 45,
+                         math.random(100, 500) / 35, math.random(100, 500) / 25}
     local params_menu = {{
         id = "db",
         name = "db",
@@ -32,7 +35,7 @@ function Rachim:init()
         max = 30,
         div = 0.1,
         exp = true,
-        default = math.random(100, 300) / 100,
+        default = default_dur[self.id],
         engine = true
     }, {
         id = "wet",
@@ -49,6 +52,13 @@ function Rachim:init()
         max = 16,
         default = math.random(1, 16),
         div = 1
+    }, {
+        id = "octave",
+        name = "octave",
+        min = -3,
+        max = 3,
+        default = default_octaves[self.id],
+        div = 1
     }}
     for i = 1, 16 do
         table.insert(params_menu, {
@@ -57,7 +67,7 @@ function Rachim:init()
             min = 0,
             max = 8,
             div = 1,
-            default = 0
+            default = math.random(0, 8)
         })
     end
 
@@ -84,7 +94,7 @@ function Rachim:init()
         end
         params:set_action(pid, function(x)
             if pram.engine then
-                -- engine.set(self.id, pram.id, x)
+                engine.set(self.id, pram.id, x)
             elseif pram.action then
                 pram.action(x)
             end
@@ -104,6 +114,19 @@ function Rachim:init()
             end
             if self.is_playing and self.steps >= params:get(self.id .. "dur") * 10 then
                 self.pos = self.pos + 1
+                if self.pos > params:get(self.id .. "length") then
+                    self.pos = 1
+                end
+                local note_index = params:get(self.id .. "note" .. self.pos)
+                local scale = musicutil.generate_scale(60, 1, 1)
+                local note = scale[(note_index - 1) % #scale + 1] + 12 * params:get(self.id .. "octave")
+                local freq = musicutil.note_num_to_freq(note)
+                if note_index > 0 then
+                    engine.set(self.id, "db", params:get(self.id .. "db"))
+                    engine.set(self.id, "freq", freq)
+                else
+                    engine.set(self.id, "db", -96)
+                end
                 print(self.id .. " " .. self.pos)
                 self.steps = 0
             end

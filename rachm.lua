@@ -17,6 +17,8 @@ rachim = {}
 rachim_num = 5
 shift = false
 
+engine.name = "Rachim"
+
 function init()
     params:add_number("sel_pattern", "pattern", 1, rachim_num, 1)
     params:add_number("sel_param", "param", 1, 20, 1)
@@ -28,6 +30,10 @@ function init()
     end
 
     params:default()
+
+    for i = 1, rachim_num do
+        engine.set(i, "db", -96)
+    end
 
     clock.run(function()
         while true do
