@@ -18,24 +18,26 @@ function Rachim:init()
     self.start_playing = false
     self.is_playing = false
     local default_octaves = {2, 1, 0, -1, -3}
-    local default_dur = {math.random(100, 500) / 100, math.random(100, 500) / 55, math.random(100, 500) / 45,
+    local default_dur = {math.random(100, 500) / 65, math.random(100, 500) / 55, math.random(100, 500) / 45,
                          math.random(100, 500) / 35, math.random(100, 500) / 25}
+    local default_wet = {0.7,0.8,0.9,0.9,1.0}
+    local default_db = {-7,-6,0,-2,-3}
     local params_menu = {{
         id = "db",
         name = "db",
         min = -48,
         max = 12,
         div = 0.5,
-        default = 0,
+        default = default_db[self.id],
         engine = true
     }, {
         id = "dur",
         name = "dur",
         min = 0.1,
-        max = 30,
+        max = 60,
         div = 0.1,
         exp = true,
-        default = default_dur[self.id],
+        default = default_dur[self.id]*2,
         engine = true
     }, {
         id = "wet",
@@ -43,7 +45,7 @@ function Rachim:init()
         min = 0,
         max = 1,
         div = 0.01,
-        default = 0.7,
+        default = default_wet[self.id],
         engine = true
     }, {
         id = "length",
@@ -161,6 +163,7 @@ function Rachim:stop()
         self.is_playing = false
         self.pos = 0
         self.steps = 10000
+        engine.set(self.id,"db",-96)
     end
 end
 
@@ -192,11 +195,14 @@ function Rachim:redraw()
                 if i == 2 then
                     s = string.format("%02X", params:get(self.id .. param_list[i]))
                 end
-                local level = 5
-                if i == params:get("sel_param") + 1 and self.id == params:get("sel_pattern") then
-                    level = 15
-                end
+                local level = 7
                 screen.level(level)
+                if i == params:get("sel_param") + 1 and self.id == params:get("sel_pattern") then
+                    screen.rect(6-1, y_start + (i - 1) * 11-6, 10, 7)
+                    screen.fill()
+                    screen.level(0)
+                end
+
                 screen.move(6, y_start + (i - 1) * 11)
                 screen.text(s:sub(1, 1))
                 screen.move(6 + 5, y_start + (i - 1) * 11)
@@ -206,19 +212,18 @@ function Rachim:redraw()
         end
     end
     for j = 1, params:get(self.id .. "length") do
-        local level = 5
+        local level = 2
         if self.id == params:get("sel_pattern") then
-            level = 8
+            level = 7
+        end
+        if j == self.pos and self.is_playing then
+          level = 15
         end
         screen.level(level)
         if j == params:get("sel_param") - 4 and self.id == params:get("sel_pattern") then
-            screen.level(15)
-        end
-        if j == self.pos then
-            screen.level(10)
-            screen.rect(6 + 5 + 14 + (j - 1) * 6 - 1, y_start + (self.id - 1) * 11 - 6, 5, 7)
-            screen.fill()
-            screen.level(0)
+          screen.rect(6 + 5 + 14 + (j - 1) * 6 - 1, y_start + (self.id - 1) * 11 - 6, 5, 7)
+          screen.fill()
+          screen.level(0)
         end
         screen.move(6 + 5 + 14 + (j - 1) * 6, y_start + (self.id - 1) * 11)
         screen.text(params:get(self.id .. "note" .. j))

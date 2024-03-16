@@ -72,7 +72,7 @@ Engine_Rachim : CroneEngine {
             snd=RLPF.ar(snd,note.midicps*6,0.8);
             snd=snd*EnvGen.ar(Env.adsr(attackTime:dur,sustainLevel:1,releaseTime:dur*Rand(4,10)),gate:gate,doneAction:2);
             snd=Balance2.ar(snd[0],snd[1],Rand(-1,1));
-            snd = snd * 24.neg.dbamp * Lag.kr(db,dur).dbamp;
+            snd = snd * 24.neg.dbamp * Lag.kr(db,dur/4).dbamp;
             Out.ar(busDry,snd*(1-wet));
             Out.ar(busWet,snd*wet);
         }).send(server);
@@ -86,10 +86,10 @@ Engine_Rachim : CroneEngine {
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
-            sndWet=SelectX.ar(LFNoise2.kr(1/5).range(0.5,0.9),[sndWet,Fverb.ar(sndWet[0],sndWet[1],117,
+            sndWet=Fverb.ar(sndWet[0],sndWet[1],117,
                 decay:VarLag.kr(LFNoise0.kr(1/3),3).range(50,100),
                 tail_density:VarLag.kr(LFNoise0.kr(1/3),3).range(50,100),
-            )]);
+            );
             snd2 = sndWet + sndDry;
             snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
             snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.5),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
@@ -99,7 +99,7 @@ Engine_Rachim : CroneEngine {
             snd2=HPF.ar(snd2,20);
             snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
             snd2=BPeakEQ.ar(snd2,660,1,-3);
-            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.1,0.3),[snd2,Fverb.ar(snd2[0],snd2[1],100,decay:VarLag.kr(LFNoise0.kr(1/3),3).range(60,96))]);
+            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb.ar(snd2[0],snd2[1],100,decay:VarLag.kr(LFNoise0.kr(1/3),3).range(60,96))]);
             snd2=snd2*EnvGen.ar(Env.new([48.neg,0],[3])).dbamp;
             snd2 = Compander.ar(snd2,snd2)/2;
             snd2 = Limiter.ar(snd2,0.9);

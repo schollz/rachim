@@ -20,7 +20,7 @@ shift = false
 engine.name = "Rachim"
 
 function init()
-    params:add_number("sel_pattern", "pattern", 1, rachim_num, 1)
+    params:add_number("sel_pattern", "pattern", 1, rachim_num, 3)
     params:add_number("sel_param", "param", 1, 20, 1)
 
     for i = 1, rachim_num do
@@ -101,7 +101,7 @@ end
 function redraw()
     screen.clear()
     screen.aa(0)
-    screen.font_face(3)
+    screen.font_face(68)
     screen.level(15)
 
     for i = 1, rachim_num do
