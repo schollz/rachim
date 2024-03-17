@@ -172,7 +172,6 @@ Engine_Rachim : CroneEngine {
 			var id=msg[1];
 			var k=msg[2];
 			var v=msg[3];
-            [id,k,v].postln;
             syns.at(id).set(k,v);
 		});
 

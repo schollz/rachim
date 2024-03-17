@@ -156,7 +156,6 @@ function Rachim:init()
         else
           engine.set(self.id,"gate",0)
         end
-        print(self.id.." "..self.pos)
         self.steps=0
       end
       if self.pos>params:get(self.id.."length") then
