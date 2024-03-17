@@ -146,10 +146,10 @@ function Rachim:init()
           self.pos=1
         end
         local note_index=params:get(self.id.."note"..self.pos)
-        local scale=musicutil.generate_scale(60,1,1)
-        local note=scale[(note_index-1)%#scale+1]+12*params:get(self.id.."octave")
-        local freq=musicutil.note_num_to_freq(note)
         if note_index>0 then
+          local scale=musicutil.generate_scale(60,1,1)
+          local note=scale[(note_index-1)%#scale+1]+12*params:get(self.id.."octave")
+          local freq=musicutil.note_num_to_freq(note)
           engine.set(self.id,"db",params:get(self.id.."db"))
           engine.set(self.id,"gate",1)
           engine.set(self.id,"freq",freq)
