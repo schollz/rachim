@@ -65,7 +65,7 @@ Engine_Rachim : CroneEngine {
 	    sig = sig * EnvGen.ar(Env.adsr(1,1,1,0.1),gate:finish,doneAction:2);
             Out.ar(busDry,sig*(1-wet));
             Out.ar(busWet,sig*wet);
-        }).send(server);
+        }).add;
 
         SynthDef("sine",{
             arg busWet,busDry,db=0,freq=40,gate=1,wet=1,dur=1,id=1,attack=1,release=1,finish=1;
@@ -80,7 +80,7 @@ Engine_Rachim : CroneEngine {
 	    snd = snd * EnvGen.ar(Env.adsr(1,1,1,0.1),gate:finish,doneAction:2);
             Out.ar(busDry,snd*(1-wet));
             Out.ar(busWet,snd*wet);
-        }).send(server);
+        }).add;
 
         SynthDef("fxout",{
             arg busWet, busDry, finish=1;
@@ -119,8 +119,8 @@ Engine_Rachim : CroneEngine {
             //snd2 = Limiter.ar(snd2,0.9);
             snd2 = snd2 * EnvGen.ar(Env.new([0,1],[3]));
 	    snd2 = snd2 * EnvGen.ar(Env.adsr(1,1,1,0.2),gate:finish,doneAction:2);
-            Out.ar(0,snd2);
-        }).send(server);
+            Out.ar(0,snd2 * 4.neg.dbamp);
+        }).add;
 
 
 		// initialize variables
