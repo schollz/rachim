@@ -184,10 +184,13 @@ Engine_Rachim : CroneEngine {
 			val.free;
 		});
 		syns.keysValuesDo({ arg k, val;
+			["freeing",val].postln;
 			val.free;
 		});
+		["freeing",synOut].postln;
 		synOut.free;
 		buses.keysValuesDo({ arg k, val;
+			["freeing",val].postln;
 			val.free;
 		});
 	}
