@@ -88,19 +88,19 @@ Engine_Rachim : CroneEngine {
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
-            sndWet = Fverb.ar(sndWet[0],sndWet[1],117,
-                decay:LFNoise2.kr(1/5).range(50,90),
-                tail_density:LFNoise2.kr(1/5).range(50,90),
-            );
-	    //sndWet = DelayN.ar(sndWet, 0.03, 0.03);
-	    //sndWet = CombN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!32, 4);
-	    //sndWet = SplayAz.ar(2, sndWet);
-	    //sndWet = LPF.ar(sndWet, 1500);
-	    //5.do{sndWet = AllpassN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!2, 3)};
-	    //sndWet = LPF.ar(sndWet, 1500);
-	    //sndWet = LeakDC.ar(sndWet);
+            //sndWet = Fverb.ar(sndWet[0],sndWet[1],117,
+            //    decay:LFNoise2.kr(1/5).range(50,90),
+            //    tail_density:LFNoise2.kr(1/5).range(50,90),
+            //);
+	    sndWet = DelayN.ar(sndWet, 0.03, 0.03);
+	    sndWet = CombN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!32, 4);
+	    sndWet = SplayAz.ar(2, sndWet);
+	    sndWet = LPF.ar(sndWet, 1500);
+	    5.do{sndWet = AllpassN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!2, 3)};
+	    sndWet = LPF.ar(sndWet, 1500);
+	    sndWet = LeakDC.ar(sndWet);
             snd2 = sndWet + sndDry;
-            snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
+            //snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
             //snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.4),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
             //snd2=SelectX.ar(LFNoise2.kr(1/10).range(0,0.6),[snd2,AnalogDegrade.ar(snd2,0.2,0.2,0.5,0.5)]);
             //snd2=SelectX.ar(LFNoise2.kr(1/12).range(0,0.3),[snd2,AnalogLoss.ar(snd2,0.5,0.5,0.5,0.5)]);
