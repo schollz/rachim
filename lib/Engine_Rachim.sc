@@ -83,11 +83,11 @@ Engine_Rachim : CroneEngine {
         }).add;
 
         SynthDef("fxout",{
-            arg busWet, busDry, finish=1;
+            arg busWet, busDry, finish=1, drive=0;
             var snd2;
             var shimmer=0.25;
-            var sndWet=In.ar(busWet,2);
-            var sndDry=In.ar(busDry,2);
+            var sndWet=LeakDC.ar(In.ar(busWet,2));
+            var sndDry=LeakDC.ar(In.ar(busDry,2));
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
@@ -103,18 +103,18 @@ Engine_Rachim : CroneEngine {
 	    //sndWet = LPF.ar(sndWet, 1500);
 	    //sndWet = LeakDC.ar(sndWet);
             snd2 = sndWet + sndDry;
-            //snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
+            // snd2=AnalogTape.ar(snd2*drive.dbamp,0.7,0.9,0.8) * drive.neg.dbamp;
             //snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.4),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
             //snd2=SelectX.ar(LFNoise2.kr(1/10).range(0,0.6),[snd2,AnalogDegrade.ar(snd2,0.2,0.2,0.5,0.5)]);
             //snd2=SelectX.ar(LFNoise2.kr(1/12).range(0,0.3),[snd2,AnalogLoss.ar(snd2,0.5,0.5,0.5,0.5)]);
-            snd2=snd2.tanh*0.75;
-            snd2=HPF.ar(snd2,20);
-            snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
-            snd2=BPeakEQ.ar(snd2,660,1,-3);
-            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb.ar(snd2[0],snd2[1],200,
-		decay: LFNoise2.kr(1/5).range(50,90),
-		tail_density: LFNoise2.kr(1/5).range(50,90),
-	    )]);
+            snd2=(snd2).tanh*0.75;
+            //snd2=HPF.ar(snd2,20);
+           // snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
+          //  snd2=BPeakEQ.ar(snd2,660,1,-3);
+         //   snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb.ar(snd2[0],snd2[1],200,
+	//	decay: LFNoise2.kr(1/5).range(50,90),
+	//	tail_density: LFNoise2.kr(1/5).range(50,90),
+	    //)]);
             //snd2 = Compander.ar(snd2,snd2)/2;
             //snd2 = Limiter.ar(snd2,0.9);
             snd2 = snd2 * EnvGen.ar(Env.new([0,1],[3]));
@@ -167,6 +167,11 @@ Engine_Rachim : CroneEngine {
         ]));
 
 		"done loading.".postln;
+		this.addCommand("set_fx","sf",{ arg msg;
+			var k=msg[1];
+			var v=msg[2];
+			synOut.set(k,v);
+		});
 
 		this.addCommand("set","isf",{ arg msg;
 			var id=msg[1];

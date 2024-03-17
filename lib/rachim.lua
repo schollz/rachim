@@ -21,7 +21,7 @@ function Rachim:init()
   local default_dur={math.random(100,500)/65,math.random(100,500)/55,math.random(100,500)/45,
   math.random(100,500)/35,math.random(100,500)/25}
   local default_wet={0.7,0.8,0.9,0.9,1.0}
-  local default_db={-7,-6,0,-2,-3}
+  local default_db={-12,-10,0,-2,-3}
   local default_attack={0.1,1,2,3,4}
   local default_release={1,2,4,6,8}
   local params_menu={{
