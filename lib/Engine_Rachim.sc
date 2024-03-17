@@ -9,6 +9,7 @@ Engine_Rachim : CroneEngine {
 	var buses;
 	var syns;
 	var oscs;
+	var synOut;
 	// Rachim ^
     
 
@@ -68,7 +69,8 @@ Engine_Rachim : CroneEngine {
 
         SynthDef("sine",{
             arg busWet,busDry,db=0,freq=40,gate=1,wet=1,dur=1,id=1,attack=1,release=1,finish=1;
-            var note=Vibrato.kr(Clip.kr(freq,20,18000),LFNoise2.kr(1/(1+dur)).range(0.1,1),LFNoise2.kr(1/(1+dur)).range(0.001,0.007),0.01).cpsmidi;
+            var note=Vibrato.kr(Clip.kr(freq,20,18000),LFNoise2.kr(1/(1+dur)).linexp(-1,1,0.1,4),
+	    	LFNoise2.kr(1/(1+dur)).range(0.001,freq.cpsmidi.linlin(36,120,0.002,0.01),0.01)).cpsmidi;
             var snd=Pulse.ar([note-Rand(0,0.05),note+Rand(0,0.05)].midicps,SinOsc.kr(Rand(1,3),Rand(0,pi)).range(0.3,0.7));
             snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/12).range(dur*0.5,dur),Rand(0,pi)).range(0.0,1.0));
             snd=RLPF.ar(snd,note.midicps*6,0.707);
@@ -80,7 +82,7 @@ Engine_Rachim : CroneEngine {
             Out.ar(busWet,snd*wet);
         }).send(server);
 
-        SynthDef("out",{
+        SynthDef("fxout",{
             arg busWet, busDry, finish=1;
             var snd2;
             var shimmer=0.25;
@@ -89,17 +91,17 @@ Engine_Rachim : CroneEngine {
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
-            //sndWet = Fverb.ar(sndWet[0],sndWet[1],117,
-            //    decay:LFNoise2.kr(1/5).range(50,90),
-            //    tail_density:LFNoise2.kr(1/5).range(50,90),
-            //);
-	    sndWet = DelayN.ar(sndWet, 0.03, 0.03);
-	    sndWet = CombN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!32, 4);
-	    sndWet = SplayAz.ar(2, sndWet);
-	    sndWet = LPF.ar(sndWet, 1500);
-	    5.do{sndWet = AllpassN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!2, 3)};
-	    sndWet = LPF.ar(sndWet, 1500);
-	    sndWet = LeakDC.ar(sndWet);
+            sndWet = Fverb.ar(sndWet[0],sndWet[1],150,
+                decay:80,
+                tail_density:70,
+            );
+	    //sndWet = DelayN.ar(sndWet, 0.03, 0.03);
+	    //sndWet = CombN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!32, 4);
+	    //sndWet = SplayAz.ar(2, sndWet);
+	    //sndWet = LPF.ar(sndWet, 1500);
+	    //5.do{sndWet = AllpassN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!2, 3)};
+	    //sndWet = LPF.ar(sndWet, 1500);
+	    //sndWet = LeakDC.ar(sndWet);
             snd2 = sndWet + sndDry;
             //snd2=AnalogTape.ar(snd2,0.9,0.9,0.7);
             //snd2=SelectX.ar(LFNoise2.kr(1/4).range(0,0.4),[snd2,AnalogChew.ar(snd2,1.0,0.5,0.5)]);
@@ -135,11 +137,12 @@ Engine_Rachim : CroneEngine {
 		server.sync;
 
 		// main out
-		syns.put("out",Synth.tail(server,"out",[
+		synOut = Synth.tail(server,"fxout",[
 			busDry: buses.at("busDry"),
 			busWet: buses.at("busWet"),
-		]));
+		]);
 		server.sync;
+		synOut.postln;
 
         // create synths
         4.do({ arg i;
@@ -183,6 +186,7 @@ Engine_Rachim : CroneEngine {
 		syns.keysValuesDo({ arg k, val;
 			val.free;
 		});
+		synOut.free;
 		buses.keysValuesDo({ arg k, val;
 			val.free;
 		});
