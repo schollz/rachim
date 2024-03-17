@@ -53,7 +53,8 @@ Engine_Rachim : CroneEngine {
                 SawDPW.ar(freqs[n], Rand(0, 2))
             });
 
-            var mix = LFNoise2.kr(1/(1+dur)).range(0.7,1.0);
+            //var mix = LFNoise2.kr(1/(1+dur)).range(0.7,1.0);
+	    var mix = 0.8;
             var sig =  (center * centerGain.(mix)) + (side * sideGain.(mix));
             sig = HPF.ar(sig, freq);
             sig = BLowPass.ar(sig,freq*LFNoise2.kr(1/(1+dur)).range(4,20),1/0.707);
@@ -112,8 +113,8 @@ Engine_Rachim : CroneEngine {
 		decay: LFNoise2.kr(1/5).range(50,90),
 		tail_density: LFNoise2.kr(1/5).range(50,90),
 	    )]);
-            snd2 = Compander.ar(snd2,snd2)/2;
-            snd2 = Limiter.ar(snd2,0.9);
+            //snd2 = Compander.ar(snd2,snd2)/2;
+            //snd2 = Limiter.ar(snd2,0.9);
             snd2 = snd2 * EnvGen.ar(Env.new([0,1],[3]));
 	    snd2 = snd2 * EnvGen.ar(Env.adsr(1,1,1,0.2),gate:finish,doneAction:2);
             Out.ar(0,snd2);
