@@ -147,7 +147,7 @@ function Rachim:init()
         end
         local note_index=params:get(self.id.."note"..self.pos)
         if note_index>0 then
-          local scale=musicutil.generate_scale(60,1,1)
+          local scale=musicutil.generate_scale(params:get("root_note"),params:get("scale_mode"),1)
           local note=scale[(note_index-1)%#scale+1]+12*params:get(self.id.."octave")
           local freq=musicutil.note_num_to_freq(note)
           engine.set(self.id,"db",params:get(self.id.."db"))

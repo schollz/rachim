@@ -20,6 +20,7 @@
 -- wet
 --
 rachim_=include("lib/rachim")
+local MusicUtil=require("musicutil")
 rachim={}
 rachim_num=5
 shift=false
@@ -30,6 +31,7 @@ installer=installer_:new{
   zip="https://github.com/schollz/portedplugins/releases/download/v0.4.5/PortedPlugins-RaspberryPi.zip"
 }
 engine.name=installer:ready() and 'Rachim' or nil
+local scale_names={}
 
 function init()
   if not installer:ready() then
@@ -43,6 +45,16 @@ function init()
       return
     end
   end
+  for i=1,#MusicUtil.SCALES do
+    table.insert(scale_names,string.lower(MusicUtil.SCALES[i].name))
+  end
+
+  params:add{type="option",id="scale_mode",name="scale mode",
+    options=scale_names,default=1
+  }
+  params:add{type="number",id="root_note",name="root note",
+    min=0,max=127,default=60,formatter=function(param) return MusicUtil.note_num_to_name(param:get(),true) end
+  }
 
   params:add_number("sel_pattern","pattern",1,rachim_num,3)
   params:add_number("sel_param","param",1,20,1)
