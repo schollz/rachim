@@ -20,6 +20,7 @@
 -- wet
 --
 rachim_=include("lib/rachim")
+halfsecond=include("lib/halfsecond")
 local MusicUtil=require("musicutil")
 rachim={}
 rachim_num=5
@@ -49,13 +50,15 @@ function init()
     table.insert(scale_names,string.lower(MusicUtil.SCALES[i].name))
   end
 
+
+  halfsecond.init()
   params:add{type="option",id="scale_mode",name="scale mode",
     options=scale_names,default=1
   }
   params:add{type="number",id="root_note",name="root note",
     min=0,max=127,default=60,formatter=function(param) return MusicUtil.note_num_to_name(param:get(),true) end
   }
-
+  params:add_number("fill","fill",1,100,50)
   params:add_number("sel_pattern","pattern",1,rachim_num,3)
   params:add_number("sel_param","param",1,20,1)
   for i=1,rachim_num do

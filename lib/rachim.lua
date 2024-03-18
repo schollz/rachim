@@ -22,8 +22,9 @@ function Rachim:init()
   math.random(100,500)/35,math.random(100,500)/25}
   local default_wet={0.7,0.8,0.9,0.9,1.0}
   local default_db={-12,-10,0,-2,-3}
-  local default_attack={0.1,1,2,3,4}
+  local default_attack={0.1,5,7,9,10}
   local default_release={1,2,4,6,8}
+  local default_length=math.random(2,6)
   local params_menu={{
     id="db",
     name="db",
@@ -54,7 +55,7 @@ function Rachim:init()
     name="length",
     min=1,
     max=16,
-    default=math.random(2,16),
+    default=default_length,
     div=1
     },{
     id="octave",
@@ -81,13 +82,14 @@ function Rachim:init()
     engine=true
   }}
   local pattern_melody={}
-  for i=1,math.random(3,6) do
+  for i=1,default_length do
     table.insert(pattern_melody,0)
   end
   local random_notes={1,1,1,1,1,1,1,3,3,3,3,3,3,5,5,5,5,5,5,5,4,4,4,4,2,2,2,2,2,2,6,6,6,6,6,6,6,6,6,6,7,7,8}
   for i,_ in ipairs(pattern_melody) do
     pattern_melody[i]=math.random(0,100)<5 and 0 or random_notes[math.random(#random_notes)]
   end
+
 
   for i=1,16 do
     table.insert(params_menu,{
@@ -153,10 +155,10 @@ function Rachim:init()
           engine.set(self.id,"db",params:get(self.id.."db"))
           engine.set(self.id,"gate",1)
           engine.set(self.id,"freq",freq)
-        else
-          engine.set(self.id,"gate",0)
         end
         self.steps=0
+      elseif self.is_playing and self.steps>=util.round(params:get(self.id.."dur")*10*params:get("fill")/100) then
+        engine.set(self.id,"gate",0)
       end
       if self.pos>params:get(self.id.."length") then
         self.pos=1

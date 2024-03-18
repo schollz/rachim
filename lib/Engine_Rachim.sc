@@ -57,8 +57,8 @@ Engine_Rachim : CroneEngine {
             //var mix = LFNoise2.kr(1/(1+dur)).range(0.7,1.0);
 	    var mix = 0.8;
             var sig =  (center * centerGain.(mix)) + (side * sideGain.(mix));
-            sig = HPF.ar(sig, freq);
-            sig = BLowPass.ar(sig,freq*LFNoise2.kr(1/(1+dur)).range(4,20),1/0.707);
+            sig = HPF.ar(sig, Clip.kr(freq,20,10000));
+            sig = BLowPass.ar(sig,Clip.kr(freq*LFNoise2.kr(1/(1+dur)).range(4,20),20,10000),1/0.707);
             sig = sig * EnvGen.ar(Env.adsr(attack,1,1,release),gate:gate);
             sig = sig * 12.neg.dbamp * Lag.kr(db,dur/2).dbamp;
             sig = Pan2.ar(sig);
@@ -72,8 +72,8 @@ Engine_Rachim : CroneEngine {
             var note=Vibrato.kr(Clip.kr(freq,20,18000),LFNoise2.kr(1/(1+dur)).linexp(-1,1,0.1,4),
 	    	LFNoise2.kr(1/(1+dur)).range(0.001,freq.cpsmidi.linlin(36,120,0.002,0.01),0.01)).cpsmidi;
             var snd=Pulse.ar([note-Rand(0,0.05),note+Rand(0,0.05)].midicps,SinOsc.kr(Rand(1,3),Rand(0,pi)).range(0.3,0.7));
-            snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/12).range(dur*0.5,dur),Rand(0,pi)).range(0.0,1.0));
-            snd=RLPF.ar(snd,note.midicps*6,0.707);
+            snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/12).range(dur*0.5,dur),Rand(0,pi)).range(0.0,1.5));
+            snd=RLPF.ar(snd,Clip.kr(note.midicps*6,20,10000),0.707);
             snd=Balance2.ar(snd[0],snd[1],Rand(-1,1));
             snd = snd * EnvGen.ar(Env.adsr(attack,1,1,release),gate:gate);
             snd = snd * 24.neg.dbamp * Lag.kr(db,dur/4).dbamp;
@@ -91,9 +91,9 @@ Engine_Rachim : CroneEngine {
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
-            sndWet = Fverb.ar(sndWet[0],sndWet[1],150,
-                decay:80,
-                tail_density:70,
+            sndWet = Fverb.ar(sndWet[0],sndWet[1],200,
+                decay:LFNoise2.kr(1/5).range(60,90),
+                tail_density:LFNoise2.kr(1/5).range(70,90),
             );
 	    //sndWet = DelayN.ar(sndWet, 0.03, 0.03);
 	    //sndWet = CombN.ar(sndWet, 0.1, {Rand(0.01,0.099)}!32, 4);
@@ -108,9 +108,9 @@ Engine_Rachim : CroneEngine {
             //snd2=SelectX.ar(LFNoise2.kr(1/10).range(0,0.6),[snd2,AnalogDegrade.ar(snd2,0.2,0.2,0.5,0.5)]);
             //snd2=SelectX.ar(LFNoise2.kr(1/12).range(0,0.3),[snd2,AnalogLoss.ar(snd2,0.5,0.5,0.5,0.5)]);
             snd2=(snd2).tanh*0.75;
-            //snd2=HPF.ar(snd2,20);
-           // snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
-          //  snd2=BPeakEQ.ar(snd2,660,1,-3);
+            snd2=HPF.ar(snd2,20);
+            snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
+            snd2=BPeakEQ.ar(snd2,660,1,-3);
          //   snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb.ar(snd2[0],snd2[1],200,
 	//	decay: LFNoise2.kr(1/5).range(50,90),
 	//	tail_density: LFNoise2.kr(1/5).range(50,90),
