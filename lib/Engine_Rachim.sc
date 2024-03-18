@@ -73,7 +73,7 @@ Engine_Rachim : CroneEngine {
 	    	LFNoise2.kr(1/(1+dur)).range(0.001,freq.cpsmidi.linlin(36,120,0.002,0.01),0.01)).cpsmidi;
             var snd=Pulse.ar([note-Rand(0,0.05),note+Rand(0,0.05)].midicps,SinOsc.kr(Rand(1,3),Rand(0,pi)).range(0.3,0.7));
             snd=snd+PinkNoise.ar(SinOsc.kr(1/LFNoise2.kr(1/12).range(dur*0.5,dur),Rand(0,pi)).range(0.0,1.5));
-            snd=RLPF.ar(snd,Clip.kr(note.midicps*6,20,10000),0.707);
+            snd=RLPF.ar(snd,Clip.kr(note.midicps*6,20,4186),0.707);
             snd=Balance2.ar(snd[0],snd[1],Rand(-1,1));
             snd = snd * EnvGen.ar(Env.adsr(attack,1,1,release),gate:gate);
             snd = snd * 24.neg.dbamp * Lag.kr(db,dur/4).dbamp;
