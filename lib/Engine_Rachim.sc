@@ -91,7 +91,7 @@ Engine_Rachim : CroneEngine {
             sndWet = DelayN.ar(sndWet, 0.03, 0.03);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.13, 2,0,1,1*shimmer/2);
             sndWet = sndWet + PitchShift.ar(sndWet, 0.1, 4,0,1,0.5*shimmer/2);
-            sndWet = Fverb.ar(sndWet[0],sndWet[1],200,
+            sndWet = Fverb2.ar(sndWet[0],sndWet[1],200,
                 decay:LFNoise2.kr(1/5).range(60,90),
                 tail_density:LFNoise2.kr(1/5).range(70,90),
             );
@@ -111,10 +111,10 @@ Engine_Rachim : CroneEngine {
             snd2=HPF.ar(snd2,20);
             snd2=BPeakEQ.ar(snd2,24.midicps,1,3);
             snd2=BPeakEQ.ar(snd2,660,1,-3);
-         //   snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb.ar(snd2[0],snd2[1],200,
-	//	decay: LFNoise2.kr(1/5).range(50,90),
-	//	tail_density: LFNoise2.kr(1/5).range(50,90),
-	    //)]);
+            snd2=SelectX.ar(LFNoise2.kr(1/4).range(0.4,0.8),[snd2,Fverb2.ar(snd2[0],snd2[1],200,
+		decay: LFNoise2.kr(1/5).range(50,90),
+		tail_density: LFNoise2.kr(1/5).range(50,90),
+	    )]);
             //snd2 = Compander.ar(snd2,snd2)/2;
             //snd2 = Limiter.ar(snd2,0.9);
             snd2 = snd2 * EnvGen.ar(Env.new([0,1],[3]));
