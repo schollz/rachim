@@ -152,6 +152,9 @@ function Rachim:init()
           local scale=musicutil.generate_scale(params:get("root_note"),params:get("scale_mode"),1)
           local note=scale[(note_index-1)%#scale+1]+12*params:get(self.id.."octave")
           local freq=musicutil.note_num_to_freq(note)
+          if self.id>=1 and self.id<=4 then 
+            crow.output[self.id].volts = (note-60)/12
+          end
           engine.set(self.id,"db",params:get(self.id.."db"))
           engine.set(self.id,"gate",1)
           engine.set(self.id,"freq",freq)

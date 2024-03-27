@@ -28,8 +28,8 @@ shift=false
 
 installer_=include("lib/scinstaller/scinstaller")
 installer=installer_:new{
-  requirements={"Fverb","AnalogTape","AnalogChew","AnalogLoss","AnalogDegrade"},
-  zip="https://github.com/schollz/portedplugins/releases/download/v0.4.5/PortedPlugins-RaspberryPi.zip"
+  requirements={"Fverb2","Fverb","AnalogTape","AnalogChew","AnalogLoss","AnalogDegrade"},
+  zip="https://github.com/schollz/portedplugins/releases/download/v0.4.6/PortedPlugins-RaspberryPi.zip"
 }
 engine.name=installer:ready() and 'Rachim' or nil
 local scale_names={}
